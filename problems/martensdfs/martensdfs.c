@@ -19,7 +19,7 @@ int *visited;
 
 int hash(int k)
 {
-    return ((123456UL * 2654435769UL * k) & 0xFFFFFFFFUL) >> 8;
+    return ((2654435769UL * k) & 0xFFFFFFFFUL) >> 8;
 }
 
 void hash_insert(int k)
