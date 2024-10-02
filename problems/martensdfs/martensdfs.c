@@ -102,6 +102,18 @@ void read_input()
     }
 }
 
+void free_input()
+{
+    for (int i = 0; i < num_verts; i++)
+    {
+        if (edges[i].size > 0)
+            free(edges[i].verts);
+    }
+
+    free(edges);
+    free(traversal.verts);
+}
+
 int check_parentheses(int i)
 {
     int j = i + 1;
@@ -177,14 +189,7 @@ int main()
         printf("NO\n");
     }
 
-    for (int i = 0; i < num_verts; i++)
-    {
-        if (edges[i].size > 0)
-            free(edges[i].verts);
-    }
-
-    free(edges);
-    free(traversal.verts);
+    free_input();
 
     return 0;
 }
