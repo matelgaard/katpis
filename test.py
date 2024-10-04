@@ -7,7 +7,7 @@ time_limit = 5
 main_path = 'build/main.exe'
 
 problem = sys.argv[1]
-test_file_path = 'problems/' + problem + '/tests.txt'
+test_folder = 'problems/' + problem + '/tests/'
 
 class fcolors:
     BLACK = '\033[90m'
@@ -20,26 +20,61 @@ class fcolors:
     WHITE = '\033[97m'
     ENDC = '\033[0m'
 
-if not os.path.isfile(test_file_path):
-    print(problem + ' tests missing')
+if not os.path.exists(test_folder):
+    print(problem + ': no tests to run')
     sys.exit(0)
 
-f = open(test_file_path, 'r', encoding='ascii')
+test_files = os.listdir(test_folder)
 
-tests_str = f.read()
-tests = tests_str.split('\n\n')
+if len(test_files) == 0:
+    print(problem + ': no tests to run')
+
+tests = []
+
+for file in test_files:
+    if not file.endswith('.in'):
+        continue
+
+    test_name = file.replace('.in', '')
+    test_path = os.path.join(test_folder, file)
+
+    answer_str = None
+    answer_path = test_path.replace('.in', '.ans')
+    if os.path.isfile(answer_path):
+        answer = open(answer_path, 'r', encoding='ascii')
+        answer_str = answer.read()
+        answer_str = answer_str.removesuffix('\n')
+
+    test = open(test_path, 'r', encoding='ascii')
+
+    test_str = test.read()
+    tests.append((test_name, test_str, answer_str))
+
 for i, test in enumerate(tests):
-    print('test ' + str(i + 1))
-    print(fcolors.CYAN + test + fcolors.ENDC)
+    name = test[0]
+    input = test[1]
+    answer = test[2]
+
+    print(name)
+    print(fcolors.CYAN + test[1] + fcolors.ENDC, end='')
 
     try:
-        result = subprocess.run(args=main_path, input=test, encoding='ascii', capture_output=True, timeout=time_limit)
+        result = subprocess.run(args=main_path, input=input, encoding='ascii', capture_output=True, timeout=time_limit)
         if result.returncode != 0:
             print(fcolors.RED + 'ERROR' + fcolors.ENDC)
             continue
-        print(result.stdout)
+        out = result.stdout.removesuffix('\n')
+        if (test[2]):
+            if (out == answer):
+                print(fcolors.GREEN + out + fcolors.ENDC)
+            else:
+                print(fcolors.RED + out + fcolors.ENDC)
+        else:
+            print(out)
     except subprocess.TimeoutExpired:
         print(fcolors.RED + 'TIMED OUT' + fcolors.ENDC)
     except subprocess.SubprocessError:
         print(fcolors.RED + 'ERROR' + fcolors.ENDC)
+    
+    print('')
 

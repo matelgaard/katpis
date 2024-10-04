@@ -13,7 +13,7 @@ typedef struct {
 verts_list *edges;
 verts_list traversal;
 int *edge_hash;
-int hash_size = 16777216;
+int hash_size = 0x1000000;
 
 int *visited;
 
