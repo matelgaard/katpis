@@ -58,23 +58,26 @@ for i, test in enumerate(tests):
     print(name)
     print(fcolors.CYAN + test[1] + fcolors.ENDC, end='')
 
+    out = ''
     try:
         result = subprocess.run(args=main_path, input=input, encoding='ascii', capture_output=True, timeout=time_limit)
         if result.returncode != 0:
             print(fcolors.RED + 'ERROR' + fcolors.ENDC)
-            continue
         out = result.stdout.removesuffix('\n')
-        if (test[2]):
-            if (out == answer):
-                print(fcolors.GREEN + out + fcolors.ENDC)
-            else:
-                print(fcolors.RED + out + fcolors.ENDC)
-        else:
-            print(out)
     except subprocess.TimeoutExpired:
-        print(fcolors.RED + 'TIMED OUT' + fcolors.ENDC)
+        out = subprocess.TimeoutExpired.stdout.decode('ascii')
+        out = out.removesuffix('\n')
     except subprocess.SubprocessError:
         print(fcolors.RED + 'ERROR' + fcolors.ENDC)
+        continue
     
+    if (test[2]):
+        if (out == answer):
+            print(fcolors.GREEN + out + fcolors.ENDC)
+        else:
+            print(fcolors.RED + out + fcolors.ENDC)
+    else:
+        print(out)
+
     print('')
 
